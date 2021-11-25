@@ -6,7 +6,7 @@ const moduleName = 'module-b';
 if (!window.modules[moduleName]) {
   Object.assign(window.modules, { [moduleName]: { router, store } });
 } else {
-  throw new Error('Module name has already used.');
+  console.log('Module name has already used.');
 }
 
 export default {

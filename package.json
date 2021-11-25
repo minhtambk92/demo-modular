@@ -3,15 +3,24 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "serve": "webpack serve",
+    "build": "webpack build",
+    "lint": "vue-cli-service lint",
+    "build:module-a": "webpack --config ./src/modules/module-a/webpack.config.js",
+    "build:module-b": "webpack --config ./src/modules/module-b/webpack.config.js",
+    "build:all": "npm run build:module-a && npm run build:module-b"
   },
   "dependencies": {
     "core-js": "^3.6.5",
+    "css-loader": "^6.5.1",
+    "file-loader": "^6.2.0",
+    "style-loader": "^3.3.1",
     "vue": "^2.6.11",
+    "vue-loader-plugin": "^1.3.0",
     "vue-router": "^3.2.0",
-    "vuex": "^3.4.0"
+    "vuex": "^3.4.0",
+    "webpack": "^5.64.3",
+    "webpack-cli": "^4.9.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
@@ -24,10 +33,13 @@
     "eslint": "^6.7.2",
     "eslint-plugin-import": "^2.20.2",
     "eslint-plugin-vue": "^6.2.2",
+    "html-webpack-plugin": "^5.5.0",
     "lint-staged": "^9.5.0",
     "node-sass": "^4.12.0",
-    "sass-loader": "^8.0.2",
-    "vue-template-compiler": "^2.6.11"
+    "sass-loader": "^12.3.0",
+    "vue-loader": "^15.9.8",
+    "vue-template-compiler": "^2.6.11",
+    "webpack-dev-server": "^4.5.0"
   },
   "gitHooks": {
     "pre-commit": "lint-staged"
