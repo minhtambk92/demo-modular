@@ -3,35 +3,57 @@ import App from './App.vue';
 import router from './router';
 import store from './store';
 import loadJs from './utilities/load-js';
-import VueModular, { registerModule, registerModules } from './register-module'; // eslint-disable-line
-
-window.modules = window.modules || {};
+import Modular, {
+  registerModules,
+} from './register-module'; // eslint-disable-line
 
 Vue.config.productionTip = false;
 
-Vue.use(VueModular, { store, router });
+Vue.use(Modular, {
+  // modules: [],
+  store,
+  router,
+});
 
-loadJs('./module-a/module-a.bundle.js')
-  .then(() => {
-    registerModules(window.modules);
-  });
+const config = {
+  modules: ['module-a'],
+};
 
-loadJs('./module-b/module-b.bundle.js')
-  .then(() => {
-    registerModules(window.modules);
-  });
+install(config); // eslint-disable-line
 
-// setTimeout(() => {
-//   registerModules(window.modules);
-// }, 500);
+setTimeout(() => {
+  const modName = 'module-b';
+  loadModule(modName); // eslint-disable-line
+}, 3000);
 
 new Vue({
   router,
   data() {
     return {
       modules: window.modules,
+      config,
     };
+  },
+  watch: {
+    modules(mods) {
+      registerModules(mods);
+    },
   },
   store,
   render: (h) => h(App),
 }).$mount('#app');
+
+function install(conf) {
+  if (Array.isArray(conf.modules) && conf.modules.length > 0) {
+    conf.modules.forEach((modName) => {
+      loadModule(modName); // eslint-disable-line
+    });
+  }
+}
+
+function loadModule(modName) {
+  loadJs(`./${modName}/${modName}.bundle.js`)
+    .then(() => {
+      registerModules(window.modules);
+    });
+}

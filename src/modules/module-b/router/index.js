@@ -1,5 +1,5 @@
 import Module from '../Module.vue';
-import HomeB from '../views/HomeB.vue';
+// import HomeB from '../views/HomeB.vue';
 
 export default {
   routes: [
@@ -9,8 +9,8 @@ export default {
       children: [
         {
           path: '/',
-          name: 'home',
-          component: HomeB,
+          name: 'homeB',
+          component: () => import(/* webpackChunkName: "home-b" */'../views/HomeB.vue'),
         },
       ],
     },

@@ -10,7 +10,11 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     filename: (chunkData) => {
       console.log('chuckData.chunk.name => ', chunkData.chunk.name);
-      return './[name].bundle.js';
+      return chunkData.chunk.name === 'app' ? './[name].bundle.js' : './[name]/[name].bundle.js';
+    },
+    chunkFilename: (chunkData) => {
+      console.log('chuckData.chunk.runtime/chuckData.chunk.name => ', `${chunkData.chunk.runtime}/${chunkData.chunk.name}`);
+      return chunkData.chunk.runtime === 'app' ? './[name].bundle.js' : `./${chunkData.chunk.runtime}/[name].bundle.js`;
     },
   },
   module: {

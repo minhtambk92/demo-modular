@@ -9,10 +9,13 @@ export default {
       children: [
         {
           path: '/',
-          name: 'home',
+          name: 'homeA',
           component: HomeA,
         },
       ],
     },
   ],
+  beforeEach: (to, from, next) => {
+    next();
+  },
 };

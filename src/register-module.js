@@ -3,6 +3,7 @@
 const defaultOptions = {
   vmProperty: '$modules',
 };
+window.modules = window.modules || [];
 let modules = {};
 let store = null;
 let router = null;
@@ -21,20 +22,21 @@ export default function (Vue, options = {}) {
   if (options.router) router = options.router;
   if (options.vmProperty) registerVmProperty(Vue, options.vmProperty);
   if (isModuleShape(options.modules)) registerModules(options.modules);
+  registerModules(window.modules);
 }
 
 /**
  * Helper to assure that shape of object is module definition(s)
  * @param {Object} mod
  */
-const isModuleShape = (mod) => !!mod && typeof mod === 'object' && Object.keys(mod).length > 0;
+const isModuleShape = (mod) => Array.isArray(mod) && mod.length > 0;
 
 /**
  * Define a vm instance property shorthand
  * @param {Object} Vue
  */
 export function registerVmProperty(Vue, name) {
-  if (name in Vue.prototype) return false;
+  if (name in Vue.prototype) return;
   Vue.prototype[name] = modules;
 }
 
@@ -43,18 +45,18 @@ export function registerVmProperty(Vue, name) {
  * @param {Object} mods
  */
 export function registerModules(mods) {
-  console.log('register module', mods);
-  if (!isModuleShape(mods)) return false;
-  modules = Object.assign(modules, mods);
-  Object.keys(mods).forEach((modKey) => {
-    const modDefinition = mods[modKey];
-   registerModule(modKey, modDefinition);
+  if (!isModuleShape(mods)) return;
+  mods.forEach(mod => {
+    registerModule(mod);
   });
 }
 
-export function registerModule(key, module) {
-  if (store) registerModuleStore(key, module, store);
-  if (router) registerModuleRouter(module, router);
+export function registerModule(mod) {
+  if (!!modules[mod.name]) return;
+  console.log('register module', mod);
+  modules = Object.assign(modules, { [mod.name]: { store: mod.store, router: mod.router } });
+  if (store) registerModuleStore(mod);
+  if (router) registerModuleRouter(mod);
 }
 
 /**
@@ -80,9 +82,9 @@ export function reset() {
  * @param {Object} mod
  * @param {Object} store
  */
-export function registerModuleStore(key, mod, store) {
-  if ('store' in mod === false) return false;
-  store.registerModule(key, mod.store);
+export function registerModuleStore(mod) {
+  if ('store' in mod === false) return;
+  store.registerModule(mod.name, mod.store);
 }
 
 /**
@@ -90,8 +92,8 @@ export function registerModuleStore(key, mod, store) {
  * @param {Object} mod
  * @param {Object} router
  */
-export function registerModuleRouter(mod, router) {
-  if ('router' in mod === false) return false;
+export function registerModuleRouter(mod) {
+  if ('router' in mod === false) return;
   const {
     routes: moduleRoutes,
     ...moduleMethods
@@ -102,8 +104,8 @@ export function registerModuleRouter(mod, router) {
   if (moduleMethods && Object.keys(moduleMethods).length > 0) {
     Object.keys(moduleMethods).forEach((moduleMethod) => {
       const methodName = moduleMethods[moduleMethod].name || moduleMethod;
-      if (typeof router[methodName] !== 'function') return;
-      router[methodName].call(router, moduleMethods[moduleMethod]);
+      if (typeof mod.router[methodName] !== 'function') return;
+      router[methodName].call(router, moduleMethods[methodName]);
     });
   }
 }
